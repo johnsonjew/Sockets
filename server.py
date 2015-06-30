@@ -3,11 +3,17 @@ import datetime
 
 
 def response_ok():
+    returnstr = []
     content_type = "text/plain"
     content_length = "1354"
-    date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M')
-    Str = "HTTP/1.1 200 OK" + "\r\n" + date + "\r\n"  + "Content-Type:" + content_type + "\r\n"  + "Content-Length:" + content_length + "\r\n\r\n"
-    return Str
+    date = datetime.datetime.strftime(datetime.datetime.now(),
+                                      '%Y-%m-%d %H:%M')
+    returnstr.append("HTTP/1.1 200 OK")
+    returnstr.append("Date:" + date)
+    returnstr.append("Content-Type:" + content_type)
+    returnstr.append("Content-Length:" + content_length)
+    header = '\r\n'.join(returnstr)
+    return header
 
 
 def response_error():
@@ -15,7 +21,7 @@ def response_error():
 
 
 if __name__ == '__main__':
-    ADDR = ('127.0.0.1', 7070)
+    ADDR = ('127.0.0.1', 8000)
     socket = socket.socket(
         socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
         )
