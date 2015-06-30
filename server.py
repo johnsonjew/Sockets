@@ -1,8 +1,8 @@
 import socket
 import datetime
 
-ADDR = ('127.0.0.1', 7076)
 
+ADDR = ('127.0.0.1', 6565)
 socket = socket.socket(
     socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
     )
@@ -23,19 +23,18 @@ def response_error():
     return "500 Server Error \r\n\r\n"
 
 
-while True:
-    try:
-        conn, addr = socket.accept()
-        code = ""
-        code = response_ok()
-        while True:
-            msg = conn.recv(16)
-            print msg
-            if len(msg) < 16:
-                break
-        conn.sendall(code)
-        conn.close()
-    except KeyboardInterrupt:
-        break
-
-
+def main():
+    while True:
+        try:
+            conn, addr = socket.accept()
+            code = ""
+            code = response_ok()
+            while True:
+                msg = conn.recv(16)
+                print msg
+                if len(msg) < 16:
+                    break
+            conn.sendall(code)
+            conn.close()
+        except KeyboardInterrupt:
+            break
