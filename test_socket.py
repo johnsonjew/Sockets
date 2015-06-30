@@ -1,10 +1,13 @@
 import server
 import pytest
 import socket
+import string
+import pdb
+import datetime
 
 @pytest.fixture(scope='session')
 def connection():
-    ADDR = ('127.0.0.1', 6565)
+    ADDR = ('127.0.0.1', 7070)
     client = socket.socket(
         socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
     )
@@ -12,19 +15,18 @@ def connection():
     return client
 
 def test_client(connection):
-    try:
-        connection.sendall('abc')
-        part
-        while True:
-            tempPart
-            part = part + client.recv(16)
-            connection.shutdown(socket.SHUT_WR)
-            if len(tempPart) < 16:
-                break
-        content_type = "text/plain"
-        content_length = "1354"
-        date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
-        Str = "HTTP/1.1 200 OK" + "\r\n" + date + "\r\n"  + "Content-Type:" + content_type + "\r\n"  + "Content-Length:" + content_length + "\r\n\r\n"
-        assert part == Str
-    except Exception as e:
-        print e
+    connection.sendall('abc')
+    connection.shutdown(socket.SHUT_WR)
+    part = ""
+    while True:
+        tempPart = connection.recv(16)
+        part = part + tempPart
+        if len(tempPart) < 16:
+            connection.close()
+            break
+    part_list = string.split(part, '\r\n')
+    assert part_list[0].find("200 OK") != -1
+    date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M')
+    assert part_list[1].find(date) != -1
+    assert part_list[2].find("Content-Type:") != -1
+    assert part_list[3].find("Content-Length:") != -1
