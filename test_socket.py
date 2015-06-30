@@ -1,8 +1,6 @@
-import server
 import pytest
 import socket
 import string
-import pdb
 import datetime
 
 
@@ -28,6 +26,8 @@ def test_client(connection):
             break
     part_list = string.split(part, '\r\n')
     assert part_list[0].find("200 OK") != -1
-    date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M')
+    date = datetime.datetime.strftime(datetime.datetime.now(),
+                                      '%Y-%m-%d %H:%M')
+    assert part_list[1].find(date) != -1
     assert part_list[2].find("Content-Type:") != -1
     assert part_list[3].find("Content-Length:") != -1

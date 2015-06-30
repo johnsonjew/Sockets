@@ -20,25 +20,30 @@ def response_error():
     return "500 Server Error \r\n\r\n"
 
 
+def parse_request(fullmsg):
+    split = string.split(fullmsg, ' ')
+
 if __name__ == '__main__':
     ADDR = ('127.0.0.1', 8000)
-    socket = socket.socket(
+    socket_ = socket.socket(
         socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
         )
-
-    socket.bind(ADDR)
-    socket.listen(1)
+    socket_.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    socket_.bind(ADDR)
+    socket_.listen(1)
 
     while True:
         try:
-            conn, addr = socket.accept()
+            conn, addr = socket_.accept()
             code = ""
-            code = response_ok()
+            fullmsg = ""
             while True:
+                fullmsg = fullmsg + msg
                 msg = conn.recv(16)
-                print msg
                 if len(msg) < 16:
                     break
+            fullmsg = string.split(fullmsg, '\r\n')
+            response = parse_request(fullmsg)
             conn.sendall(code)
             conn.close()
         except KeyboardInterrupt:
