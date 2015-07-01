@@ -1,6 +1,7 @@
 import socket
 import datetime
 
+CRLF = '\r\n'
 
 def response_ok():
     returnstr = []
@@ -20,8 +21,18 @@ def response_error():
     return "500 Server Error \r\n\r\n"
 
 
-def parse_request(fullmsg):
-    split = string.split(fullmsg, ' ')
+def parse_request(request):
+    request = request.split(CRLF)
+    URI = request[0].split()[1]
+    if 'GET' not in request[0]:
+        raise ValueError("Only accept GET requests")
+    elif 'HTTP/1.1' not in request[0]:
+        raise ValueError("Only accept HTTP/1.1 requests")
+    elif 'HOST' not in request[1] and len(request[1]) < 10:
+        # Dont' know what is the minimum length for host name though
+        raise ValueError("Valid Host header must be included")
+    else:
+        return URI
 
 if __name__ == '__main__':
     ADDR = ('127.0.0.1', 8000)
@@ -38,11 +49,10 @@ if __name__ == '__main__':
             code = ""
             fullmsg = ""
             while True:
-                fullmsg = fullmsg + msg
                 msg = conn.recv(16)
+                fullmsg += msg
                 if len(msg) < 16:
                     break
-            fullmsg = string.split(fullmsg, '\r\n')
             response = parse_request(fullmsg)
             conn.sendall(code)
             conn.close()
