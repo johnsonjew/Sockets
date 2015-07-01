@@ -22,10 +22,15 @@ def response_error():
 
 
 def parse_request(fullmsg):
-    tline1 = fullmsg[0]
-    line1 = tline1.split()
-    tline2 = fullmsg[1]
-    line2 = tline2.split()
+    try:
+        tline1 = fullmsg[0]
+        line1 = tline1.split()
+        tline2 = fullmsg[1]
+        line2 = tline2.split()
+    except:
+        raise SyntaxError
+    if len(line1) is not 3 or len(line2)is not 2:
+        raise SyntaxError
     if len(line1) is not 3 or len(line2)is not 2:
         raise SyntaxError
     if line1[0] != 'GET':
@@ -38,13 +43,13 @@ def parse_request(fullmsg):
 
 
 if __name__ == '__main__':
-    ADDR = ('127.0.0.1', 8764)
+    ADDR = ('127.0.0.1', 9992)
     socket_ = socket.socket(
         socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
         )
     socket_.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     socket_.bind(ADDR)
-    socket_.listen(10)
+    socket_.listen(20)
 
     while True:
         try:
@@ -61,7 +66,7 @@ if __name__ == '__main__':
             try:
                 returnstr = parse_request(fullmsg)
                 response = response_ok(returnstr)
-            except SyntaxError:
+            except SyntaxError or IndexError:
                 response = "400 Bad Request \r\n\r\n"
             except TypeError:
                 response = "406 Not Acceptable \r\n\r\n"
