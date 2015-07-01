@@ -1,18 +1,19 @@
 import socket
-import datetime
+import email.utils
 
 
-def response_ok():
+def response_ok(uri):
     returnstr = []
     content_type = "text/plain"
-    content_length = "1354"
-    date = datetime.datetime.strftime(datetime.datetime.now(),
-                                      '%Y-%m-%d %H:%M')
+    bytes = uri.encode('utf-8')
+    content_length = len(bytes)
+    date = email.utils.formatdate(usegmt=True)
     returnstr.append("HTTP/1.1 200 OK")
     returnstr.append("Date:" + date)
     returnstr.append("Content-Type:" + content_type)
     returnstr.append("Content-Length:" + content_length)
     header = '\r\n'.join(returnstr)
+    header.append(uri)
     return header
 
 
@@ -21,10 +22,23 @@ def response_error():
 
 
 def parse_request(fullmsg):
-    split = string.split(fullmsg, ' ')
+    tline1 = fullmsg[0]
+    line1 = tline1.split()
+    tline2 = fullmsg[1]
+    line2 = tline2.split()
+    if len(line1) is not 3 or len(line2)is not 2:
+        raise SyntaxError
+    if line1[0] != 'GET':
+        raise TypeError
+    if line1[2] != 'HTTP/1.1':
+        raise TypeError
+    if line2[0] != 'Host:':
+        raise SyntaxError
+    return line1[1]
+
 
 if __name__ == '__main__':
-    ADDR = ('127.0.0.1', 8000)
+    ADDR = ('127.0.0.1', 8585)
     socket_ = socket.socket(
         socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
         )
@@ -38,13 +52,20 @@ if __name__ == '__main__':
             code = ""
             fullmsg = ""
             while True:
-                fullmsg = fullmsg + msg
                 msg = conn.recv(16)
+                fullmsg = fullmsg + msg
                 if len(msg) < 16:
                     break
-            fullmsg = string.split(fullmsg, '\r\n')
-            response = parse_request(fullmsg)
-            conn.sendall(code)
+            fullmsg = fullmsg.split('\r\n')
+            response = ''
+            try:
+                parse_request(fullmsg)
+                response = response_ok()
+            except SyntaxError:
+                response = "400 Bad Request \r\n\r\n"
+            except TypeError:
+                response = "406 Not Acceptable \r\n\r\n"
+            conn.sendall(response)
             conn.close()
         except KeyboardInterrupt:
             break

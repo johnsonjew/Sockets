@@ -6,16 +6,18 @@ import datetime
 
 @pytest.fixture(scope='session')
 def connection():
-    ADDR = ('127.0.0.1', 8000)
+    ADDR = ('127.0.0.1', 8585)
     client = socket.socket(
         socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
     )
+    client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
     return client
 
 
 def test_client(connection):
-    connection.sendall('abc')
+    message = "GET /index.html HTTP/1.1" + "\r\n" + "Host: www.example.com"
+    connection.sendall(message)
     connection.shutdown(socket.SHUT_WR)
     part = ""
     while True:
@@ -25,6 +27,7 @@ def test_client(connection):
             connection.close()
             break
     part_list = string.split(part, '\r\n')
+    import pdb; pdb.set_trace()
     assert part_list[0].find("200 OK") != -1
     date = datetime.datetime.strftime(datetime.datetime.now(),
                                       '%Y-%m-%d %H:%M')

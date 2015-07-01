@@ -1,6 +1,6 @@
 import socket
 
-ADDR = ('127.0.0.1', 7000)
+ADDR = ('127.0.0.1', 8000)
 
 client = socket.socket(
     socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
