@@ -13,7 +13,7 @@ def response_ok(uri):
     returnstr.append("Content-Type:" + content_type)
     returnstr.append("Content-Length:" + content_length)
     header = '\r\n'.join(returnstr)
-    header = header + uri
+    header = header + "\r\n" + uri
     return header
 
 

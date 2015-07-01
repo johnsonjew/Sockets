@@ -53,6 +53,7 @@ def test_all(connection):
     assert part_list[1].find(date) != -1
     assert part_list[2].find("Content-Type:") != -1
     assert part_list[3].find("Content-Length:") != -1
+    assert part_list[4].find("/index.html") != -1
 
 
 def test_set():
