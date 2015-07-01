@@ -6,14 +6,14 @@ def response_ok(uri):
     returnstr = []
     content_type = "text/plain"
     bytes = uri.encode('utf-8')
-    content_length = len(bytes)
+    content_length = str(len(bytes))
     date = email.utils.formatdate(usegmt=True)
     returnstr.append("HTTP/1.1 200 OK")
     returnstr.append("Date:" + date)
     returnstr.append("Content-Type:" + content_type)
     returnstr.append("Content-Length:" + content_length)
     header = '\r\n'.join(returnstr)
-    header.append(uri)
+    header = header + uri
     return header
 
 
@@ -31,20 +31,20 @@ def parse_request(fullmsg):
     if line1[0] != 'GET':
         raise TypeError
     if line1[2] != 'HTTP/1.1':
-        raise TypeError
+        raise SyntaxError
     if line2[0] != 'Host:':
         raise SyntaxError
     return line1[1]
 
 
 if __name__ == '__main__':
-    ADDR = ('127.0.0.1', 8585)
+    ADDR = ('127.0.0.1', 8764)
     socket_ = socket.socket(
         socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
         )
     socket_.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     socket_.bind(ADDR)
-    socket_.listen(1)
+    socket_.listen(10)
 
     while True:
         try:
@@ -59,8 +59,8 @@ if __name__ == '__main__':
             fullmsg = fullmsg.split('\r\n')
             response = ''
             try:
-                parse_request(fullmsg)
-                response = response_ok()
+                returnstr = parse_request(fullmsg)
+                response = response_ok(returnstr)
             except SyntaxError:
                 response = "400 Bad Request \r\n\r\n"
             except TypeError:
