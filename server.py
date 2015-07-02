@@ -75,11 +75,8 @@ def parse_request(conn):
         if len(msg) < 1024:
             break
     fullmsg = fullmsg.split(CRLF)
-    try:
-        tline1 = fullmsg[0]
-        line1 = tline1.split()
-    except IndexError:
-        raise SyntaxError
+    tline1 = fullmsg[0]
+    line1 = tline1.split()
     if len(line1) is not 3:
         raise SyntaxError
     if line1[0] != 'GET':
