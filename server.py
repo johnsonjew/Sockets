@@ -86,13 +86,10 @@ def parse_request(conn):
         raise TypeError
     if line1[2] != 'HTTP/1.1':
         raise SyntaxError
-    try:
-        for i in range(len(fullmsg)):
-            line = fullmsg[i].split()
-            if line[0] == "Host:":
-                break
-    except IndexError:
-        raise SyntaxError
+    for i in range(len(fullmsg)):
+        line = fullmsg[i].split()
+        if line[0] == "Host:":
+            break
     return line1[1]
 
 
