@@ -5,6 +5,7 @@ import mimetypes
 import sys
 
 CRLF = '\r\n'
+ROOT = os.path.relpath('webroot')
 
 
 def server():
@@ -97,7 +98,7 @@ def parse_request(conn):
 
 
 def resolve_uri(uri):
-    path_ = 'webroot' + uri
+    path_ = ROOT + uri
     uri_info = []
     if os.path.isdir(path_):
         dir_ = os.listdir(path_)
