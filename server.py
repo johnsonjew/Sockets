@@ -86,19 +86,18 @@ def parse_request(conn):
         raise TypeError
     if line1[2] != 'HTTP/1.1':
         raise SyntaxError
-    host = False
-    for i in range(len(fullmsg)):
-        line = fullmsg[i].split()
-        if line[0] == "Host:":
-            host = True
-            break
-    if host is False:
+    try:
+        for i in range(len(fullmsg)):
+            line = fullmsg[i].split()
+            if line[0] == "Host:":
+                break
+    except IndexError:
         raise SyntaxError
     return line1[1]
 
 
 def resolve_uri(uri):
-    path_ = ROOT + uri
+    path_ = os.path.join(ROOT, uri)
     uri_info = []
     if os.path.isdir(path_):
         dir_ = os.listdir(path_)

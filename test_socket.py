@@ -10,7 +10,7 @@ def test_text():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    msg = "GET /sample.txt HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
+    msg = "GET sample.txt HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
     client.sendall(msg)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -36,7 +36,7 @@ def test_directory():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    msg = "GET /images HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
+    msg = "GET images HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
     client.sendall(msg)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -62,7 +62,7 @@ def test_jpg():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    msg = "GET /images/JPEG_example.jpg HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
+    msg = "GET images/JPEG_example.jpg HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
     client.sendall(msg)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -87,7 +87,7 @@ def test_png():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    msg = "GET /images/sample_1.png HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
+    msg = "GET images/sample_1.png HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
     client.sendall(msg)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -112,7 +112,7 @@ def test_notthere():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    msg = "GET /imthebest HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
+    msg = "GET imthebest HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
     client.sendall(msg)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -134,7 +134,7 @@ def test_wrongbreak():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    message = "GET /index.html HTTP/1.1" + "\n" + "Host: www.example.com"
+    message = "GET sample.txt HTTP/1.1"+"\n"+"Host: www.example.com"+"\r\n\r\n"
     client.sendall(message)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -155,7 +155,7 @@ def test_set():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    message = "SET /index.html HTTP/1.1" + "\r\n" + "Host: www.example.com"
+    message = "SET sample.txt HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
     client.sendall(message)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -176,7 +176,7 @@ def test_wronghttp():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    message = "GET /index.html HTTP/1.0" + "\r\n" + "Host: www.example.com"
+    message = "GET sample.txt HTTP/1.0"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
     client.sendall(message)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -197,7 +197,7 @@ def test_wrongargs():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    message = "GET /index.html" + "\r\n" + "Host: www.example.com"
+    message = "GET sample.txt"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
     client.sendall(message)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -218,7 +218,7 @@ def test_nohost():
     )
     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(ADDR)
-    message = "SET /index.html HTTP/1.1" + "\r\n" + "Hos: www.example.com"
+    message = "GET sample.txt HTTP/1.0"+"\r\n"+"Hos: www.example.com"+"\r\n\r\n"
     client.sendall(message)
     client.shutdown(socket.SHUT_WR)
     part = ""
@@ -229,4 +229,4 @@ def test_nohost():
             client.close()
             break
     part_list = string.split(part, '\r\n')
-    assert part_list[0].find("406 Not Acceptable") != -1
+    assert part_list[0].find("400 Bad Request") != -1
