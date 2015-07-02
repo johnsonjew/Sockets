@@ -1,6 +1,42 @@
 import socket
 import email.utils
+import os
+from os.path import isfile, isdir
 
+CRLF = '\r\n'
+
+def server():
+    ADDR = ('127.0.0.1', 9990)
+    socket_ = socket.socket(
+        socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
+        )
+    socket_.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    socket_.bind(ADDR)
+    socket_.listen(20)
+
+    while True:
+        try:
+            conn, addr = socket_.accept()
+            code = ""
+            fullmsg = ""
+            while True:
+                msg = conn.recv(16)
+                fullmsg = fullmsg + msg
+                if len(msg) < 16:
+                    break
+            fullmsg = fullmsg.split(CRLF)
+            response = ''
+            try:
+                returnstr = parse_request(fullmsg)
+                response = response_ok(returnstr)
+            except SyntaxError or IndexError:
+                response = "400 Bad Request \r\n\r\n"
+            except TypeError:
+                response = "406 Not Acceptable \r\n\r\n"
+            conn.sendall(response)
+            conn.close()
+        except KeyboardInterrupt:
+            break
 
 def response_ok(uri):
     returnstr = []
@@ -12,8 +48,8 @@ def response_ok(uri):
     returnstr.append("Date:" + date)
     returnstr.append("Content-Type:" + content_type)
     returnstr.append("Content-Length:" + content_length)
-    header = '\r\n'.join(returnstr)
-    header = header + "\r\n" + uri
+    header = CRLF.join(returnstr)
+    header = header + CRLF + uri
     return header
 
 
@@ -42,35 +78,18 @@ def parse_request(fullmsg):
     return line1[1]
 
 
-if __name__ == '__main__':
-    ADDR = ('127.0.0.1', 9992)
-    socket_ = socket.socket(
-        socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
-        )
-    socket_.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    socket_.bind(ADDR)
-    socket_.listen(20)
+def resolve_uri(returnstr):
+    path = 'webroot' + returnstr
 
-    while True:
-        try:
-            conn, addr = socket_.accept()
-            code = ""
-            fullmsg = ""
-            while True:
-                msg = conn.recv(16)
-                fullmsg = fullmsg + msg
-                if len(msg) < 16:
-                    break
-            fullmsg = fullmsg.split('\r\n')
-            response = ''
-            try:
-                returnstr = parse_request(fullmsg)
-                response = response_ok(returnstr)
-            except SyntaxError or IndexError:
-                response = "400 Bad Request \r\n\r\n"
-            except TypeError:
-                response = "406 Not Acceptable \r\n\r\n"
-            conn.sendall(response)
-            conn.close()
-        except KeyboardInterrupt:
-            break
+    if isdir:
+        list_dir = os.listdir(path)
+        for dir in list_dir:
+            return dir
+    if isfile:
+        with open(path, 'r') as infile:
+            msg = infile.read()
+            return msg
+
+
+if __name__ == '__main__':
+    server()
