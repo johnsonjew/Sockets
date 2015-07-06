@@ -55,6 +55,32 @@ def test_directory():
     assert part_list[5].find("JPEG_example.jpg") != -1
 
 
+def test_directoryslash():
+    ADDR = ('127.0.0.1', 10007)
+    client = socket.socket(
+        socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
+    )
+    client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    client.connect(ADDR)
+    msg = "GET /images HTTP/1.1"+"\r\n"+"Host: www.example.com"+"\r\n\r\n"
+    client.sendall(msg)
+    client.shutdown(socket.SHUT_WR)
+    part = ""
+    while True:
+        tempPart = client.recv(16)
+        part = part + tempPart
+        if len(tempPart) < 16:
+            client.close()
+            break
+    part_list = string.split(part, '\r\n')
+    assert part_list[0].find("200 OK") != -1
+    date = email.utils.formatdate(usegmt=True)
+    assert part_list[1].find(date) != -1
+    assert part_list[2].find("Content-Type: text/html") != -1
+    assert part_list[3].find("Content-Length:") != -1
+    assert part_list[5].find("JPEG_example.jpg") != -1
+
+
 def test_jpg():
     ADDR = ('127.0.0.1', 10007)
     client = socket.socket(

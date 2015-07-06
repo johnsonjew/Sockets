@@ -4,6 +4,7 @@ import os
 import mimetypes
 import sys
 
+
 CRLF = '\r\n'
 ROOT = os.path.relpath('webroot')
 
@@ -25,6 +26,7 @@ def server():
             try:
                 conn, addr = socket_.accept()
                 uri = parse_request(conn)
+                uri = uri.lstrip("/")
                 uri_info = resolve_uri(uri)
                 response = response_ok(uri_info)
             except (SyntaxError, IndexError):
@@ -63,7 +65,7 @@ def response_error(error):
         response = "406 Not Acceptable"
     elif error == 500:
         response = "500 Server Error"
-    response += CRLF + "Content-Type: text/plain" + CRLF
+    response += CRLF + "Content-Type: text/plain" + CRLF + CRLF
     return response
 
 
@@ -100,7 +102,7 @@ def resolve_uri(uri):
         uri_info.append(str(len(bytes)))
         uri_info.append('text/html; charset=UTF-8')
     elif os.path.isfile(path_):
-        with open(path_, 'r') as infile:
+        with open(path_, 'rb') as infile:
             msg = infile.read()
             uri_info.append(msg)
             uri_info.append(sys.getsizeof(msg))
