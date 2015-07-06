@@ -2,7 +2,6 @@ import socket
 import email.utils
 import os
 import mimetypes
-import sys
 
 
 CRLF = '\r\n'
@@ -105,8 +104,7 @@ def resolve_uri(uri):
         with open(path_, 'rb') as infile:
             msg = infile.read()
             uri_info.append(msg)
-            uri_info.append(sys.getsizeof(msg))
-            uri_info[1] = str(uri_info[1])
+            uri_info.append(str(len((msg))))
             content_type = mimetypes.guess_type(path_)
             uri_info.append(content_type[0])
     else:

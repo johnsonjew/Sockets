@@ -1,7 +1,6 @@
 import email.utils
 import os
 import mimetypes
-import sys
 
 
 CRLF = '\r\n'
@@ -95,8 +94,7 @@ def resolve_uri(uri):
         with open(path_, 'rb') as infile:
             msg = infile.read()
             uri_info.append(msg)
-            uri_info.append(sys.getsizeof(msg))
-            uri_info[1] = str(uri_info[1])
+            uri_info.append(str(len((msg))))
             content_type = mimetypes.guess_type(path_)
             uri_info.append(content_type[0])
     else:
@@ -108,6 +106,6 @@ if __name__ == '__main__':
     from gevent.server import StreamServer
     from gevent.monkey import patch_all
     patch_all()
-    server = StreamServer(('127.0.0.1', 10007), server_)
+    server = StreamServer(('127.0.0.1', 10008), server_)
     print('Starting server on port 10007')
     server.serve_forever()
