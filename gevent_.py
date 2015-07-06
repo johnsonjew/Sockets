@@ -1,4 +1,3 @@
-import socket
 import email.utils
 import os
 import mimetypes
@@ -8,23 +7,14 @@ CRLF = '\r\n'
 ROOT = os.path.relpath('webroot')
 
 
-def server():
-    ADDR = ('127.0.0.1', 10007)
-    socket_ = socket.socket(
-        socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_IP
-        )
-    socket_.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    socket_.bind(ADDR)
-    socket_.listen(20)
-
+def server_(socket, address):
     while True:
         try:
             response = ''
             uri = None
             uri_info = []
             try:
-                conn, addr = socket_.accept()
-                uri = parse_request(conn)
+                uri = parse_request(socket)
                 uri = uri.lstrip("/")
                 uri_info = resolve_uri(uri)
                 response = response_ok(uri_info)
@@ -36,8 +26,8 @@ def server():
                 response = response_error(404)
             except:
                 response = response_error(500)
-            conn.sendall(response)
-            conn.close()
+            socket.sendall(response)
+            socket.close()
         except KeyboardInterrupt:
             break
 
@@ -113,4 +103,9 @@ def resolve_uri(uri):
 
 
 if __name__ == '__main__':
-    server()
+    from gevent.server import StreamServer
+    from gevent.monkey import patch_all
+    patch_all()
+    server = StreamServer(('127.0.0.1', 10007), server_)
+    print('Starting server on port 10007')
+    server.serve_forever()
